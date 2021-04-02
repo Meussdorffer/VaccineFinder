@@ -29,17 +29,19 @@ def send_mms(msg) -> None:
         to=USER_PHONE
     )
 
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('search', type=str)
-    search_arg = parser.parse_args().search
-
-
+def find_vaccine(search_arg):
     data = get_data(search_arg)
     if data:
+        print(f'Found vaccines for {len(data)} locations!')
         txt_msg = 'Vaccine available at the following locations:\n'
         txt_msg += '\n'.join({x.get('address') for x in data})
         send_mms(txt_msg)
     else:
         print('No data found...')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('search', type=str)
+    search_arg = parser.parse_args().search
+    find_vaccine(search_arg)

@@ -1,6 +1,10 @@
 import os
-import requests
+try:
+    import requests
+except:
+    from botocore.vendored import requests
 import argparse
+
 
 from twilio.rest import Client
 

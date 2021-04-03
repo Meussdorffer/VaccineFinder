@@ -7,7 +7,7 @@ ERR = {
 }
 
 def lambda_handler(event, context):
-    search = event.get('portland')
+    search = event.get('search')
     if not search:
         return ERR
 

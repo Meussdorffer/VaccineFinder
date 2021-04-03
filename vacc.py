@@ -37,7 +37,6 @@ def send_mms(msg) -> None:
             from_=FROM_PHONE,
             to=phone_num
         )
-        break
 
 def find_vaccine(search_arg):
     data = get_data(search_arg)

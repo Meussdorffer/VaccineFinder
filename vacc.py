@@ -12,7 +12,7 @@ URL = os.environ['VACC_URL']
 ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
 AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
 FROM_PHONE = os.environ['TWILIO_PHONE']
-USER_PHONE = os.environ['USER_PHONE']
+TO_PHONES = os.environ['USER_PHONE'].split(',')
 
 
 def get_data(region_search) -> list:
@@ -27,18 +27,23 @@ def get_data(region_search) -> list:
 
 def send_mms(msg) -> None:
     client = Client(ACCOUNT_SID, AUTH_TOKEN)
-    message = client.messages.create(
-        body=msg,
-        from_=FROM_PHONE,
-        to=USER_PHONE
-    )
+    for phone_num in TO_PHONES:
+        print(f'Sending text to {phone_num}')
+        client.messages.create(
+            body=msg,
+            from_=FROM_PHONE,
+            to=phone_num
+        )
+        break
 
 def find_vaccine(search_arg):
     data = get_data(search_arg)
     if data:
         print(f'Found vaccines for {len(data)} locations!')
-        txt_msg = 'Vaccine available at the following locations:\n'
-        txt_msg += '\n'.join({x.get('address') for x in data})
+        txt_msg = '\n\nVaccine available at the following locations:\n\n'
+        txt_msg += '\n\n'.join({x.get('address') for x in data})
+        txt_msg += '\n\nSign up for your appointment below\n\n'
+        txt_msg += 'https://www.mhealthappointments.com/covidappt'
         send_mms(txt_msg)
     else:
         print('No data found...')

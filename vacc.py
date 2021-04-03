@@ -15,10 +15,12 @@ FROM_PHONE = os.environ['TWILIO_PHONE']
 TO_PHONES = os.environ['USER_PHONE'].split(',')
 
 
-def get_data(region_search) -> list:
+def get_data(region_search, addr_search=None) -> list:
+    addr_search = region_search if not addr_search else addr_search
     f = lambda datum: (
         region_search.lower() in datum.get('region', '').lower()
         and datum.get('availability').lower() == 'yes'
+        and addr_search.lower() in datum.get('address', '').lower()
     )
 
     r = requests.get(URL)
@@ -26,6 +28,7 @@ def get_data(region_search) -> list:
 
 
 def send_mms(msg) -> None:
+
     client = Client(ACCOUNT_SID, AUTH_TOKEN)
     for phone_num in TO_PHONES:
         print(f'Sending text to {phone_num}')
@@ -42,7 +45,11 @@ def find_vaccine(search_arg):
         print(f'Found vaccines for {len(data)} locations!')
         txt_msg = '\n\nVaccine available at the following locations:\n\n'
         txt_msg += '\n\n'.join({x.get('address') for x in data})
-        txt_msg += '\n\nSign up for your appointment below\n\n'
+        txt_msg += '\n\n\nSign up for your appointment below!\n\n'
+
+        if len(txt_msg) > 1500:
+            txt_msg = txt_msg[:1500]
+
         txt_msg += 'https://www.mhealthappointments.com/covidappt'
         send_mms(txt_msg)
     else:
